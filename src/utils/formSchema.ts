@@ -70,18 +70,13 @@ export const formSchema = (tokenDetailsList: TokenDetails[]) =>
         isDurationSelect: z.boolean(),
         isCollapsed: z.boolean(),
         durationType: DurationTypeSchema,
-        duration: z.union([z.string(), z.date(), z.undefined()]).refine(
+        duration: z.union([z.date().optional(), z.undefined()]).refine(
           (value) => {
-            if (value === undefined || value === '') {
-              return true;
-            }
-            if (value instanceof Date) {
-              return true;
-            }
-            return true && !isNaN(Number(value)) && Number(value) > 0;
+            if (value === undefined) return true;
+            return value instanceof Date;
           },
           {
-            message: 'Invalid duration value',
+            message: dictionary.invalidDateFormat,
           },
         ),
       }),
