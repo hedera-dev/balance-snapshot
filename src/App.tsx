@@ -28,43 +28,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import dictionary from '@/dictionary/en.json';
 import { TokenDetails } from '@/types/tokenDetails-response';
-import { DurationType, FormData, HoldersForm } from '@/components/HoldersForm';
+import { FormData, HoldersForm } from '@/components/HoldersForm';
 import { createFetchUrl } from '@/utils/createFetchUrl';
 import { copyToClipboard } from '@/utils/copyToClipboard';
-import { filterBalances } from '@/utils/filterBalances';
-import { fetchNftsWithDuration } from '@/utils/fetchNftsWithDuration';
+import { formatData } from '@/utils/formatData';
 
 const App = () => {
   const [tokenDetailsList, setTokenDetailsList] = useState<TokenDetails[]>([]);
   const [formData, setFormData] = useState<FormData['formData']>([]);
-  console.log('formData:', formData);
-  const [data, setData] = useState<Balance[]>([]);
-  const [responses, setResponses] = useState<BalancesWithNFT[][]>([]);
-  const [filteredBalancesData, setFilteredBalancesData] = useState<BalancesWithNFT[]>([]);
+  const [data, setData] = useState<BalancesWithNFT[]>([]);
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
 
-  const filterData = async (responses: BalancesWithNFT[][]): Promise<Balance[]> => {
-    let data = responses.flatMap((response) => response);
-    let nftBalances = await fetchNftsWithDuration(
-      data.filter((item) => item.isNFT),
-      setProgress,
-    );
-    let nonNftBalances = data.filter((item) => !item.isNFT);
-
-    const filteredBalancesData = [...nftBalances, ...nonNftBalances];
-    setFilteredBalancesData(filteredBalancesData);
-
-    return filterBalances(filteredBalancesData);
-  };
-
   const fetchData = async (
     url: string,
-    isNFT: boolean,
-    durationType: DurationType,
     isDurationSelect: boolean,
-    minAmount: string,
     tokenId: string,
+    minAmount?: string,
     duration?: string | Date,
   ): Promise<BalancesWithNFT[]> => {
     const response = await fetch(url);
@@ -77,13 +57,11 @@ const App = () => {
 
     let nextData: BalancesWithNFT[] = [];
     if (data.links.next) {
-      nextData = await fetchData(`${nodeUrl}${data.links.next}`, isNFT, durationType, isDurationSelect, minAmount, tokenId, duration);
+      nextData = await fetchData(`${nodeUrl}${data.links.next}`, isDurationSelect, tokenId, minAmount, duration);
     }
 
     const balancesWithNFT: BalancesWithNFT[] = data.balances.map((balance: Balance) => ({
       ...balance,
-      isNFT,
-      durationType,
       isDurationSelect,
       minAmount,
       tokenId,
@@ -97,17 +75,17 @@ const App = () => {
     setProgress(0);
     try {
       const progressIncrement = 50 / formData.length;
-      const promises = formData.map(async (item) => {
-        const { tokenId, minAmount, isNFT, duration, durationType, isDurationSelect } = item;
-        const url = createFetchUrl(tokenId, minAmount, isNFT, tokenDetailsList);
-        const data = await fetchData(url, isNFT, durationType, isDurationSelect, minAmount, tokenId, duration);
+      const promises = formData.map(async ({ tokenId, minAmount, duration, isDurationSelect }) => {
+        const url = createFetchUrl(tokenId, tokenDetailsList, isDurationSelect, minAmount, duration);
+
+        const data = await fetchData(url, isDurationSelect, tokenId, minAmount, duration);
         setProgress((prevProgress) => prevProgress + progressIncrement);
         return data;
       });
 
-      const responses = await Promise.all(promises);
-      setResponses(responses);
-      setData(await filterData(responses));
+      const responses = (await Promise.all(promises)).flat();
+      const sortedData = responses.sort((a, b) => b.balance - a.balance);
+      setData(sortedData);
 
       return data;
     } catch (error) {
@@ -135,10 +113,6 @@ const App = () => {
   useEffect(() => {
     if (!isFetching && isFetched) setShouldFetch(false);
   }, [isFetched, isFetching]);
-
-  useEffect(() => {
-    setData(filterBalances(filteredBalancesData));
-  }, []);
 
   return (
     <div className="container mx-auto">
@@ -176,13 +150,24 @@ const App = () => {
                 id="holders"
                 value={Array.isArray(data) ? data.map((item) => item.account).join(', ') : ''}
               />
-              <Button
-                onClick={async () => {
-                  await copyToClipboard(Array.isArray(data) ? data.map((item) => item.account).join(', ') : '');
-                }}
-              >
-                {dictionary.copyToClipboard}
-              </Button>
+              <div className="flex w-full gap-6">
+                <Button
+                  className="w-1/2"
+                  onClick={async () => {
+                    await copyToClipboard(Array.isArray(data) ? formatData(data) : '');
+                  }}
+                >
+                  {dictionary.copyList}
+                </Button>
+                <Button
+                  className="w-1/2"
+                  onClick={async () => {
+                    await copyToClipboard(Array.isArray(data) ? formatData(data, true) : '');
+                  }}
+                >
+                  {dictionary.copyListWithBalance}
+                </Button>
+              </div>
             </div>
           </>
         )

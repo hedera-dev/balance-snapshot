@@ -17,21 +17,16 @@
  * limitations under the License.
  *
  */
-import { DurationType } from '@/components/HoldersForm';
 
-export const changeDurationToDate = (duration: string | Date, durationType: DurationType): Date => {
-  if (typeof duration === 'string') {
-    const now = new Date();
+import { BalancesWithNFT } from '@/types/balances-response';
 
-    switch (durationType) {
-      case 'days':
-        return new Date(now.setDate(now.getDate() - Number(duration)));
-      case 'weeks':
-        return new Date(now.setDate(now.getDate() - Number(duration) * 7));
-      case 'months':
-        return new Date(now.setDate(now.getDate() - Number(duration) * 30));
-    }
-  }
-
-  return duration;
+export const formatData = (data: BalancesWithNFT[], includeBalance: boolean = false) => {
+  return data
+    .map((item) => {
+      if (includeBalance) {
+        return `${item.account}, ${item.balance}`;
+      }
+      return item.account;
+    })
+    .join('\n');
 };

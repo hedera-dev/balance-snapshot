@@ -1,6 +1,7 @@
 {
   "copiedToClipboard": "Copied to clipboard",
-  "copyToClipboard": "Copy to clipboard",
+  "copyList": "Copy list",
+  "copyListWithBalance": "Copy list with balance",
   "httpError": "HTTP error! Status:",
   "title": "Token Balance Snapshot",
   "description": "Use this tool to find holders of tokens or NFTs - you can then copy the list as a CSV for use in other tools such as the Airdrop Manager.",
@@ -28,5 +29,7 @@
   "durationSwitchLabelLeft": "Date",
   "durationSwitchLabelRight": "Duration",
   "durationAccordion": "Duration(Optional)",
-  "tokenIdRequired": "TokenId is required"
+  "tokenIdRequired": "TokenId is required",
+  "asSpecificDate": "As of specific date",
+  "invalidDateFormat": "Invalid date format"
 }

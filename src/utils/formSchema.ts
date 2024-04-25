@@ -28,8 +28,6 @@ const getCommonValues = (ctx: any, tokenDetailsList: TokenDetails[]) => {
   return { maxDecimalPlaces, isFungible };
 };
 
-const DurationTypeSchema = z.union([z.literal('days'), z.literal('weeks'), z.literal('months')]);
-
 export const formSchema = (tokenDetailsList: TokenDetails[]) =>
   z.object({
     formData: z.array(
@@ -40,48 +38,46 @@ export const formSchema = (tokenDetailsList: TokenDetails[]) =>
           .refine((value) => /^\d\.\d\.\d*$/.test(value), {
             message: dictionary.tokenIdFormatError,
           }),
-        minAmount: z.string().superRefine((value, ctx) => {
-          const { maxDecimalPlaces, isFungible } = getCommonValues(ctx, tokenDetailsList);
+        minAmount: z
+          .string()
+          .optional()
+          .default('0')
+          .transform((value) => (value.trim() === '' ? '0' : value))
+          .superRefine((value, ctx) => {
+            const { maxDecimalPlaces, isFungible } = getCommonValues(ctx, tokenDetailsList);
 
-          if (isNaN(Number(value)) || value === '' || value === null) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: dictionary.minAmountRequired,
-            });
-            return false;
-          }
+            if (isNaN(Number(value))) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: dictionary.minAmountRequired,
+              });
+              return false;
+            }
 
-          if (isFungible) {
-            return true;
-          }
+            if (isFungible) {
+              return true;
+            }
 
-          const regex = maxDecimalPlaces === 0 ? new RegExp(`^-?\\d*$`) : new RegExp(`^-?\\d*(\\.\\d{0,${maxDecimalPlaces}})?$`);
-          const isValid = regex.test(value) && Number(value) >= 0;
-          if (!isValid) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `${dictionary.nonFungibleMinAmountFormatError} ${maxDecimalPlaces}`,
-            });
-          }
-          return isValid;
-        }),
+            const regex = maxDecimalPlaces === 0 ? new RegExp(`^-?\\d*$`) : new RegExp(`^-?\\d*(\\.\\d{0,${maxDecimalPlaces}})?$`);
+            const isValid = regex.test(value) && Number(value) >= 0;
+            if (!isValid) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `${dictionary.nonFungibleMinAmountFormatError} ${maxDecimalPlaces}`,
+              });
+            }
+            return isValid;
+          }),
         tokenName: z.string(),
-        isNFT: z.boolean(),
         isDurationSelect: z.boolean(),
         isCollapsed: z.boolean(),
-        durationType: DurationTypeSchema,
-        duration: z.union([z.string(), z.date(), z.undefined()]).refine(
+        duration: z.union([z.date().optional(), z.undefined()]).refine(
           (value) => {
-            if (value === undefined || value === '') {
-              return true;
-            }
-            if (value instanceof Date) {
-              return true;
-            }
-            return true && !isNaN(Number(value)) && Number(value) > 0;
+            if (value === undefined) return true;
+            return value instanceof Date;
           },
           {
-            message: 'Invalid duration value',
+            message: dictionary.invalidDateFormat,
           },
         ),
       }),
