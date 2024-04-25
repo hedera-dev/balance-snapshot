@@ -17,11 +17,16 @@
  * limitations under the License.
  *
  */
+
 import { BalancesWithNFT } from '@/types/balances-response';
 
-export const filterBalances = (filteredNftData: BalancesWithNFT[]): BalancesWithNFT[] => {
-  return filteredNftData.filter((balance, index, self) => {
-    const isUniqueAccount = self.findIndex((b) => b.account === balance.account) === index;
-    return isUniqueAccount;
-  });
+export const formatData = (data: BalancesWithNFT[], includeBalance: boolean = false) => {
+  return data
+    .map((item) => {
+      if (includeBalance) {
+        return `${item.account}, ${item.balance}`;
+      }
+      return item.account;
+    })
+    .join('\n');
 };

@@ -17,17 +17,19 @@
  * limitations under the License.
  *
  */
+
 import { TokenDetails } from '@/types/tokenDetails-response';
 import { nodeUrl } from '@/utils/const';
 
-export const createFetchUrl = (tokenId: string, minAmount: string, isNFT: boolean, tokenDetailsList: TokenDetails[]) => {
-  if (!isNFT) {
-    const currentTokenDetails = tokenDetailsList?.find((token: TokenDetails) => token.token_id === tokenId);
+export const createFetchUrl = (tokenId: string, minAmount: string, tokenDetailsList: TokenDetails[], isDurationSelect: boolean, duration?: Date) => {
+  const currentTokenDetails = tokenDetailsList?.find((token) => token.token_id === tokenId);
+  const amount = Number(minAmount) * Math.pow(10, Number(currentTokenDetails?.decimals));
+  let url = `${nodeUrl}/api/v1/tokens/${tokenId}/balances?account.balance=gte:${amount}&limit=200`;
 
-    // Move digits to the right to match the token's decimals
-    const amount = Number(minAmount) * Math.pow(10, Number(currentTokenDetails?.decimals));
-    return `${nodeUrl}/api/v1/tokens/${tokenId}/balances?account.balance=gte:${amount}&limit=100`;
+  if (isDurationSelect && duration) {
+    const timestamp = Math.floor(duration.getTime() / 1000);
+    url += `&timestamp=${timestamp}`;
   }
 
-  return `${nodeUrl}/api/v1/tokens/${tokenId}/balances?account.balance=gte:${minAmount}&limit=100`;
+  return url;
 };

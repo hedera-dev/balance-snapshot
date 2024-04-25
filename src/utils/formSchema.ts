@@ -40,31 +40,36 @@ export const formSchema = (tokenDetailsList: TokenDetails[]) =>
           .refine((value) => /^\d\.\d\.\d*$/.test(value), {
             message: dictionary.tokenIdFormatError,
           }),
-        minAmount: z.string().superRefine((value, ctx) => {
-          const { maxDecimalPlaces, isFungible } = getCommonValues(ctx, tokenDetailsList);
+        minAmount: z
+          .string()
+          .optional()
+          .default('0')
+          .transform((value) => (value.trim() === '' ? '0' : value))
+          .superRefine((value, ctx) => {
+            const { maxDecimalPlaces, isFungible } = getCommonValues(ctx, tokenDetailsList);
 
-          if (isNaN(Number(value)) || value === '' || value === null) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: dictionary.minAmountRequired,
-            });
-            return false;
-          }
+            if (isNaN(Number(value))) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: dictionary.minAmountRequired,
+              });
+              return false;
+            }
 
-          if (isFungible) {
-            return true;
-          }
+            if (isFungible) {
+              return true;
+            }
 
-          const regex = maxDecimalPlaces === 0 ? new RegExp(`^-?\\d*$`) : new RegExp(`^-?\\d*(\\.\\d{0,${maxDecimalPlaces}})?$`);
-          const isValid = regex.test(value) && Number(value) >= 0;
-          if (!isValid) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `${dictionary.nonFungibleMinAmountFormatError} ${maxDecimalPlaces}`,
-            });
-          }
-          return isValid;
-        }),
+            const regex = maxDecimalPlaces === 0 ? new RegExp(`^-?\\d*$`) : new RegExp(`^-?\\d*(\\.\\d{0,${maxDecimalPlaces}})?$`);
+            const isValid = regex.test(value) && Number(value) >= 0;
+            if (!isValid) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `${dictionary.nonFungibleMinAmountFormatError} ${maxDecimalPlaces}`,
+              });
+            }
+            return isValid;
+          }),
         tokenName: z.string(),
         isNFT: z.boolean(),
         isDurationSelect: z.boolean(),
