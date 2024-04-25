@@ -28,7 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import dictionary from '@/dictionary/en.json';
 import { TokenDetails } from '@/types/tokenDetails-response';
-import { DurationType, FormData, HoldersForm } from '@/components/HoldersForm';
+import { FormData, HoldersForm } from '@/components/HoldersForm';
 import { createFetchUrl } from '@/utils/createFetchUrl';
 import { copyToClipboard } from '@/utils/copyToClipboard';
 import { formatData } from '@/utils/formatData';
@@ -42,7 +42,6 @@ const App = () => {
 
   const fetchData = async (
     url: string,
-    durationType: DurationType,
     isDurationSelect: boolean,
     tokenId: string,
     minAmount?: string,
@@ -58,12 +57,11 @@ const App = () => {
 
     let nextData: BalancesWithNFT[] = [];
     if (data.links.next) {
-      nextData = await fetchData(`${nodeUrl}${data.links.next}`, durationType, isDurationSelect, tokenId, minAmount, duration);
+      nextData = await fetchData(`${nodeUrl}${data.links.next}`, isDurationSelect, tokenId, minAmount, duration);
     }
 
     const balancesWithNFT: BalancesWithNFT[] = data.balances.map((balance: Balance) => ({
       ...balance,
-      durationType,
       isDurationSelect,
       minAmount,
       tokenId,
@@ -77,10 +75,10 @@ const App = () => {
     setProgress(0);
     try {
       const progressIncrement = 50 / formData.length;
-      const promises = formData.map(async ({ tokenId, minAmount, duration, durationType, isDurationSelect }) => {
+      const promises = formData.map(async ({ tokenId, minAmount, duration, isDurationSelect }) => {
         const url = createFetchUrl(tokenId, tokenDetailsList, isDurationSelect, minAmount, duration);
 
-        const data = await fetchData(url, durationType, isDurationSelect, tokenId, minAmount, duration);
+        const data = await fetchData(url, isDurationSelect, tokenId, minAmount, duration);
         setProgress((prevProgress) => prevProgress + progressIncrement);
         return data;
       });

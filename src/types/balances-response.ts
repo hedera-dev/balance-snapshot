@@ -17,7 +17,6 @@
  * limitations under the License.
  *
  */
-import { DurationType } from '@/components/HoldersForm';
 
 export type Balance = {
   account: string;
@@ -29,7 +28,6 @@ export type BalancesWithNFT = {
   account: string;
   balance: number;
   decimals: number;
-  durationType: DurationType;
   isDurationSelect: boolean;
   minAmount?: string;
   tokenId: string;

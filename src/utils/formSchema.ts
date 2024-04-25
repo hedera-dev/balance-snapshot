@@ -28,8 +28,6 @@ const getCommonValues = (ctx: any, tokenDetailsList: TokenDetails[]) => {
   return { maxDecimalPlaces, isFungible };
 };
 
-const DurationTypeSchema = z.union([z.literal('days'), z.literal('weeks'), z.literal('months')]);
-
 export const formSchema = (tokenDetailsList: TokenDetails[]) =>
   z.object({
     formData: z.array(
@@ -73,7 +71,6 @@ export const formSchema = (tokenDetailsList: TokenDetails[]) =>
         tokenName: z.string(),
         isDurationSelect: z.boolean(),
         isCollapsed: z.boolean(),
-        durationType: DurationTypeSchema,
         duration: z.union([z.date().optional(), z.undefined()]).refine(
           (value) => {
             if (value === undefined) return true;

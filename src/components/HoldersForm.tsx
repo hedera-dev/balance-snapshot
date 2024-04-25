@@ -46,15 +46,12 @@ type HoldersFormProps = {
   progress: number;
 };
 
-export type DurationType = 'days' | 'weeks' | 'months';
-
 export type FormData = {
   formData: {
     tokenId: string;
     minAmount?: string;
     tokenName: string;
     isDurationSelect: boolean;
-    durationType: DurationType;
     isCollapsed: boolean;
     duration?: Date;
   }[];
@@ -93,7 +90,6 @@ export const HoldersForm = ({
           isDurationSelect: false,
           duration: undefined,
           isCollapsed: false,
-          durationType: 'days',
         },
       ],
     },
@@ -124,7 +120,6 @@ export const HoldersForm = ({
         isDurationSelect: formData.isDurationSelect,
         duration: formData.duration,
         isCollapsed: formData.isCollapsed,
-        durationType: formData.durationType,
       });
       return data;
     } catch (error) {
@@ -137,7 +132,6 @@ export const HoldersForm = ({
         isDurationSelect: formData.isDurationSelect,
         duration: formData.duration,
         isCollapsed: formData.isCollapsed,
-        durationType: formData.durationType,
       });
     }
   };
@@ -169,7 +163,6 @@ export const HoldersForm = ({
         isDurationSelect: formData.isDurationSelect,
         duration: formData.duration,
         isCollapsed: formData.isCollapsed,
-        durationType: formData.durationType,
       });
     }
   };
@@ -179,8 +172,8 @@ export const HoldersForm = ({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {fields.map((field, index) => (
           <div className="flex flex-col justify-center" key={field.id}>
-            <div className="flex flex-col items-start justify-center gap-2">
-              <div className="mx-auto w-full sm:w-1/2">
+            <div className="flex flex-col items-start justify-center gap-4">
+              <div className="mx-auto mb-4 w-full sm:w-1/2">
                 <FormField
                   control={control}
                   name={`formData.${index}.tokenId`}
@@ -188,7 +181,7 @@ export const HoldersForm = ({
                     <FormItem>
                       <FormLabel>{dictionary.tokenId}</FormLabel>
                       <FormControl>
-                        <>
+                        <div className="relative">
                           <Input
                             {...field}
                             placeholder={dictionary.exampleTokenId}
@@ -201,8 +194,8 @@ export const HoldersForm = ({
                               void handleTokenIdBlur(event.target.value, index);
                             }}
                           />
-                          {fields[index].tokenName && <p className="text-sm text-muted-foreground">{fields[index].tokenName}</p>}
-                        </>
+                          {fields[index].tokenName && <p className="absolute top-[103%] text-sm text-muted-foreground">{fields[index].tokenName}</p>}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
