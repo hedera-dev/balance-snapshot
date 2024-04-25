@@ -21,7 +21,7 @@
 import { TokenDetails } from '@/types/tokenDetails-response';
 import { nodeUrl } from '@/utils/const';
 
-export const createFetchUrl = (tokenId: string, minAmount: string, tokenDetailsList: TokenDetails[], isDurationSelect: boolean, duration?: Date) => {
+export const createFetchUrl = (tokenId: string, tokenDetailsList: TokenDetails[], isDurationSelect: boolean, minAmount?: string, duration?: Date) => {
   const currentTokenDetails = tokenDetailsList?.find((token) => token.token_id === tokenId);
   const amount = Number(minAmount) * Math.pow(10, Number(currentTokenDetails?.decimals));
   let url = `${nodeUrl}/api/v1/tokens/${tokenId}/balances?account.balance=gte:${amount}&limit=200`;

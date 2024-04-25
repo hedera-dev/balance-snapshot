@@ -71,7 +71,6 @@ export const formSchema = (tokenDetailsList: TokenDetails[]) =>
             return isValid;
           }),
         tokenName: z.string(),
-        isNFT: z.boolean(),
         isDurationSelect: z.boolean(),
         isCollapsed: z.boolean(),
         durationType: DurationTypeSchema,

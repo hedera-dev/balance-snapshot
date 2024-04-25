@@ -51,9 +51,8 @@ export type DurationType = 'days' | 'weeks' | 'months';
 export type FormData = {
   formData: {
     tokenId: string;
-    minAmount: string;
+    minAmount?: string;
     tokenName: string;
-    isNFT: boolean;
     isDurationSelect: boolean;
     durationType: DurationType;
     isCollapsed: boolean;
@@ -91,7 +90,6 @@ export const HoldersForm = ({
           tokenId: '',
           minAmount: '',
           tokenName: '',
-          isNFT: false,
           isDurationSelect: false,
           duration: undefined,
           isCollapsed: false,
@@ -123,7 +121,6 @@ export const HoldersForm = ({
         tokenId: formData.tokenId,
         minAmount: formData.minAmount,
         tokenName: data.name,
-        isNFT: data.type === 'NON_FUNGIBLE_UNIQUE',
         isDurationSelect: formData.isDurationSelect,
         duration: formData.duration,
         isCollapsed: formData.isCollapsed,
@@ -137,7 +134,6 @@ export const HoldersForm = ({
         tokenId: formData.tokenId,
         minAmount: formData.minAmount,
         tokenName: dictionary.wrongTokenId,
-        isNFT: formData.isNFT,
         isDurationSelect: formData.isDurationSelect,
         duration: formData.duration,
         isCollapsed: formData.isCollapsed,
@@ -170,7 +166,6 @@ export const HoldersForm = ({
         tokenId: formData.tokenId,
         minAmount: formData.minAmount,
         tokenName: '',
-        isNFT: formData.isNFT,
         isDurationSelect: formData.isDurationSelect,
         duration: formData.duration,
         isCollapsed: formData.isCollapsed,

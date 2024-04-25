@@ -29,10 +29,9 @@ export type BalancesWithNFT = {
   account: string;
   balance: number;
   decimals: number;
-  isNFT: boolean;
   durationType: DurationType;
   isDurationSelect: boolean;
-  minAmount: string;
+  minAmount?: string;
   tokenId: string;
   duration?: string | Date;
 };

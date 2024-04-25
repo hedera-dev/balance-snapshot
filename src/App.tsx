@@ -42,11 +42,10 @@ const App = () => {
 
   const fetchData = async (
     url: string,
-    isNFT: boolean,
     durationType: DurationType,
     isDurationSelect: boolean,
-    minAmount: string,
     tokenId: string,
+    minAmount?: string,
     duration?: string | Date,
   ): Promise<BalancesWithNFT[]> => {
     const response = await fetch(url);
@@ -59,12 +58,11 @@ const App = () => {
 
     let nextData: BalancesWithNFT[] = [];
     if (data.links.next) {
-      nextData = await fetchData(`${nodeUrl}${data.links.next}`, isNFT, durationType, isDurationSelect, minAmount, tokenId, duration);
+      nextData = await fetchData(`${nodeUrl}${data.links.next}`, durationType, isDurationSelect, tokenId, minAmount, duration);
     }
 
     const balancesWithNFT: BalancesWithNFT[] = data.balances.map((balance: Balance) => ({
       ...balance,
-      isNFT,
       durationType,
       isDurationSelect,
       minAmount,
@@ -79,10 +77,10 @@ const App = () => {
     setProgress(0);
     try {
       const progressIncrement = 50 / formData.length;
-      const promises = formData.map(async ({ tokenId, minAmount, isNFT, duration, durationType, isDurationSelect }) => {
-        const url = createFetchUrl(tokenId, minAmount, tokenDetailsList, isDurationSelect, duration);
+      const promises = formData.map(async ({ tokenId, minAmount, duration, durationType, isDurationSelect }) => {
+        const url = createFetchUrl(tokenId, tokenDetailsList, isDurationSelect, minAmount, duration);
 
-        const data = await fetchData(url, isNFT, durationType, isDurationSelect, minAmount, tokenId, duration);
+        const data = await fetchData(url, durationType, isDurationSelect, tokenId, minAmount, duration);
         setProgress((prevProgress) => prevProgress + progressIncrement);
         return data;
       });
