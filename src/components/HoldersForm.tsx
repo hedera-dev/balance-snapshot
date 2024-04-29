@@ -225,7 +225,7 @@ export const HoldersForm = ({
                   name={`formData.${index}.duration`}
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{dictionary.asSpecificDate}</FormLabel>
+                      <FormLabel>{dictionary.setDate}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
