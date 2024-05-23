@@ -1,4 +1,4 @@
-# NFT-Token-Holders-List-Builder
+# Token Balance Snapshot
 
 <!-- TODO -->
 
