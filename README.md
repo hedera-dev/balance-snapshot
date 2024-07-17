@@ -1,4 +1,4 @@
-# Token Balance Snapshot
+# Balance Snapshot
 
 <!-- TODO -->
 
